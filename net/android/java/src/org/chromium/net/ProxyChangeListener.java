@@ -34,12 +34,14 @@ public class ProxyChangeListener {
     private Delegate mDelegate;
 
     private static class ProxyConfig {
-        public ProxyConfig(String host, int port) {
+        public ProxyConfig(String host, int port, String exclist) {
             mHost = host;
             mPort = port;
+            mExclist = exclist;
         }
         public final String mHost;
         public final int mPort;
+        public final String mExclist;
     }
 
     public interface Delegate {
@@ -99,6 +101,7 @@ public class ProxyChangeListener {
             try {
                 final String GET_HOST_NAME = "getHost";
                 final String GET_PORT_NAME = "getPort";
+                final String GET_EXCLUSION_LIST = "getExclusionList";
                 String className;
                 String proxyInfo;
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
@@ -117,11 +120,12 @@ public class ProxyChangeListener {
                 Class<?> cls = Class.forName(className);
                 Method getHostMethod = cls.getDeclaredMethod(GET_HOST_NAME);
                 Method getPortMethod = cls.getDeclaredMethod(GET_PORT_NAME);
+                Method getExclusionListMethod = cls.getDeclaredMethod(GET_EXCLUSION_LIST);
 
                 String host = (String) getHostMethod.invoke(props);
                 int port = (Integer) getPortMethod.invoke(props);
-
-                return new ProxyConfig(host, port);
+                String exclusionlist = (String) getExclusionListMethod.invoke(props);
+                return new ProxyConfig(host, port, exclusionlist);
             } catch (ClassNotFoundException ex) {
                 Log.e(TAG, "Using no proxy configuration due to exception:" + ex);
                 return null;
@@ -154,7 +158,8 @@ public class ProxyChangeListener {
         // Note that this code currently runs on a MESSAGE_LOOP_UI thread, but
         // the C++ code must run the callbacks on the network thread.
         if (cfg != null) {
-            nativeProxySettingsChangedTo(mNativePtr, cfg.mHost, cfg.mPort);
+            nativeProxySettingsChangedTo(mNativePtr, cfg.mHost, cfg.mPort,
+                                         cfg.mExclist);
         } else {
             nativeProxySettingsChanged(mNativePtr);
         }
@@ -184,7 +189,8 @@ public class ProxyChangeListener {
     @NativeClassQualifiedName("ProxyConfigServiceAndroid::JNIDelegate")
     private native void nativeProxySettingsChangedTo(long nativePtr,
                                                      String host,
-                                                     int port);
+                                                     int port,
+                                                     String exclist);
     @NativeClassQualifiedName("ProxyConfigServiceAndroid::JNIDelegate")
     private native void nativeProxySettingsChanged(long nativePtr);
 }
