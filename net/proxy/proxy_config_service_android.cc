@@ -170,7 +170,7 @@ void CreateStaticProxyConfig(const std::string& host, int port,
       while (tokenizer.GetNext()) {
         std::string token = tokenizer.token();
         std::string pattern;
-        TrimWhitespaceASCII(token, TRIM_ALL, &pattern);
+        TrimWhitespaceASCII(token, base::TRIM_ALL, &pattern);
         if (pattern.empty())
           continue;
         VLOG(0) << "Add bypass rules:" << pattern.c_str();
