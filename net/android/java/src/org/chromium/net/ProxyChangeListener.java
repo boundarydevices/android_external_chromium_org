@@ -101,7 +101,7 @@ public class ProxyChangeListener {
             try {
                 final String GET_HOST_NAME = "getHost";
                 final String GET_PORT_NAME = "getPort";
-                final String GET_EXCLUSION_LIST = "getExclusionList";
+                final String GET_EXCLUSION_LIST = "getExclusionListAsString";
                 String className;
                 String proxyInfo;
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
